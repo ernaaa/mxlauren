@@ -14,7 +14,7 @@ on:
         type: string
 
 env:
-  DEPLOYMENT_FOLDER: index.html
+  DEPLOYMENT_FOLDER: dist
 
 jobs:
 # Please do not rename this job
@@ -27,13 +27,26 @@ jobs:
         with:
           submodules: 'recursive'
 
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: v16.x
+
+      - name: Build Node assets
+        env:
+          CI: true
+          SITE_URL: ${{ inputs.site-url }}
+        run: |
+          npm ci
+          npm run build
+
 # Please do not touch the following action
       - name: Store deployment content
         uses: ionos-deploy-now/artifact-action@v1
         with:
           api-key: ${{ secrets.IONOS_API_KEY }}
           service-host: api-eu.ionos.space
-          project-id: 9ec18376-a129-42d4-a731-ffe85cc31e51
+          project-id: ba012bcd-0904-4143-a17c-ec88350bc0e9
           branch-id: ${{ inputs.branch-id }}
           version: ${{ github.sha }}
           folder: ${{ env.DEPLOYMENT_FOLDER }}
